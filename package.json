@@ -1,0 +1,8 @@
+{
+  "name": "redux-store-slice",
+  "version": "0.0.0",
+  "description": "Create a slice of your redux store for sharing with your components",
+  "main": "index.ts",
+  "author": "Dibyo Majumdar <dibyo.majumdar@gmail.com>",
+  "license": "MIT"
+}
