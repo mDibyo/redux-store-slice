@@ -4,5 +4,12 @@
   "description": "Create a slice of your redux store for sharing with your components",
   "main": "index.ts",
   "author": "Dibyo Majumdar <dibyo.majumdar@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/lodash.get": "^4.4.3",
+    "@types/lodash.set": "^4.3.3",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
+    "redux": "^3.7.2"
+  }
 }
