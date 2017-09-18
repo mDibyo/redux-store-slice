@@ -1,6 +1,6 @@
 import _get from 'lodash.get';
 import _set from 'lodash.set';
-import { Action, GenericStoreEnhancer, Reducer, Store, StoreCreator } from 'redux';
+import { Action, GenericStoreEnhancer, Reducer, Store, StoreCreator, StoreEnhancer } from 'redux';
 
 const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
   (reducer: Reducer, ...rest: any[]) => {
@@ -12,17 +12,27 @@ const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
         store.replaceReducer(reducer);
       }
 
-      return (
-        sliceReducer: Reducer<StateSlice> | undefined,
-        initialStateSlice: StateSlice | undefined,
-      ) => {
-        if (initialStateSlice) {
+      function createStoreSlice(
+        sliceReducer: Reducer<StateSlice>,
+        preloadedStateSlice?: StateSlice,
+        sliceEnhancer?: StoreEnhancer<StateSlice>,
+      ): Store<StateSlice> {
+        if (typeof preloadedStateSlice === 'function' && typeof sliceEnhancer === 'undefined') {
+          sliceEnhancer = preloadedStateSlice;
+          preloadedStateSlice = undefined
+        }
+
+        if (sliceEnhancer) {
+          return sliceEnhancer(createStoreSlice)(sliceReducer, preloadedStateSlice);
+        }
+
+        if (preloadedStateSlice) {
           const sliceInitActionType: string = `redux-store-slice/@@INIT_SLICE_${slice}`;
           const sliceInitAction: Action = { type: sliceInitActionType };
 
           const currentReducer = reducer;
           replaceSliceReducer(
-            (stateSlice, action) => action.type === sliceInitActionType ? initialStateSlice : stateSlice,
+            (stateSlice, action) => action.type === sliceInitActionType ? preloadedStateSlice : stateSlice,
           );
           store.dispatch(sliceInitAction);
           replaceSliceReducer(currentReducer);
@@ -37,7 +47,9 @@ const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
           getState: (): StateSlice => _get(store.getState(), slice),
           replaceReducer: replaceSliceReducer,
         };
-      };
+      }
+
+      return createStoreSlice;
     }
 
     return {
