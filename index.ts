@@ -5,14 +5,24 @@ import { GenericStoreEnhancer, Reducer, Store, StoreCreator } from 'redux';
 const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
   (reducer: Reducer, ...rest: any[]) => {
     const store: Store = createStore(reducer, ...rest);
+
     function createStoreSlice<StoreSlice>(slice: string): StoreCreator {
-      return () => {
+      function replaceSliceReducer(nextSliceReducer: Reducer<StoreSlice>) {
+        const reducer = _set({ ...reducer }, slice, nextSliceReducer);
+        store.replaceReducer(reducer);
+      }
+
+      return (sliceReducer: Reducer<StoreSlice> | undefined) => {
+        if (sliceReducer) {
+          replaceSliceReducer(sliceReducer);
+        }
+
         return <Store<StoreSlice>>{
           ...store,
           getState: (): StoreSlice => _get(store.getState(), slice),
-          replaceReducer: (nextSliceReducer) => _set({ ...reducer }, slice, nextSliceReducer),
-        }
-      }
+          replaceReducer: replaceSliceReducer,
+        };
+      };
     }
 
     return {
