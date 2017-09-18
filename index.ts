@@ -2,7 +2,7 @@ import _get from 'lodash.get';
 import _set from 'lodash.set';
 import { Action, GenericStoreEnhancer, Reducer, Store, StoreCreator, StoreEnhancer } from 'redux';
 
-const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
+const withSlicing: GenericStoreEnhancer = (createStore: StoreCreator) =>
   (reducer: Reducer, ...rest: any[]) => {
     const store: Store = createStore(reducer, ...rest);
 
@@ -62,4 +62,4 @@ const withStoreSlices: GenericStoreEnhancer = (createStore: StoreCreator) =>
     }
   };
 
-export default withStoreSlices;
+export default withSlicing;
